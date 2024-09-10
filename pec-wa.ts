@@ -58,6 +58,32 @@ export interface GameState {
   winner: Player | null;
 }
 
+const suitSymbols: Record<Suit, string> = {
+  spades: "♤",
+  hearts: "♡",
+  diamonds: "♢",
+  clubs: "♧",
+};
+
+export const prettyPrintGameState = (state: GameState): void => {
+  const separator = "━".repeat(40);
+  const playerHands = state.players.map(
+    (hand, index) =>
+      `Player ${index + 1}: ${hand.length.toString().padStart(2, " ")} cards - ${hand.map((card) => `${suitSymbols[card.suit]} ${card.rank}`).join(" ")}`,
+  );
+  const runs = Object.entries(state.runs).map(
+    ([suit, cards]) =>
+      `${suitSymbols[suit as Suit]} : ${cards.map((card) => card.rank.padStart(2, " ")).join(" ")}`,
+  );
+  const winner = state.winner !== null ? `Winner: Player ${state.winner + 1}` : "No winner yet";
+
+  console.log(
+    [separator, ...playerHands, separator, "Table:", ...runs, separator, winner, separator].join(
+      "\n",
+    ),
+  );
+};
+
 type PlayCardEvent = { type: "playCard"; player: Player; card: Card };
 type PassTurnEvent = { type: "passTurn"; player: Player };
 export type GameEvent = PlayCardEvent | PassTurnEvent;
@@ -108,6 +134,11 @@ export const isValidPlay = (card: Card, runs: GameState["runs"]): boolean => {
   const highestIndex = ranks.indexOf(highestRank);
 
   return cardIndex === lowestIndex - 1 || cardIndex === highestIndex + 1;
+};
+
+// Function to get valid moves for a player
+export const validPlays = (hand: Hand, runs: GameState["runs"]): Card[] => {
+  return hand.filter((card) => isValidPlay(card, runs));
 };
 
 // Updated playCard function
