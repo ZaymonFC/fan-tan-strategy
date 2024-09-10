@@ -1,0 +1,16 @@
+{
+  "name": "pec-wa",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "immer": "^10.1.1",
+    "signia": "^0.1.5",
+    "ts-pattern": "^5.3.1"
+  }
+}
