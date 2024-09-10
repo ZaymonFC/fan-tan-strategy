@@ -1,29 +1,8 @@
 import { react } from "signia";
-import {
-  createGame,
-  pretty,
-  validPlays,
-  type GameEvent,
-  type GameState,
-  type Hand,
-} from "./pec-wa";
+import { createGame, pretty, type GameState } from "./pec-wa";
+import { type PlayHand, randomStrategy } from "./strategies";
 
-type PlayHand = (player: number, hand: Hand, runs: GameState["runs"]) => GameEvent;
 type PecWaPlayer = { player: number; play: PlayHand };
-
-const randomStrategy: PlayHand = (player, hand, runs) => {
-  const availablePlays = validPlays(hand, runs);
-
-  if (availablePlays.length === 0) {
-    return { type: "passTurn", player };
-  } else {
-    return {
-      type: "playCard",
-      player,
-      card: availablePlays[Math.floor(Math.random() * availablePlays.length)],
-    };
-  }
-};
 
 const gameRunner = (players: PecWaPlayer[], quiet = false): Promise<GameState> => {
   return new Promise((resolve) => {
