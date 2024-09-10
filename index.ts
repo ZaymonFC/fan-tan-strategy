@@ -1,7 +1,7 @@
 import { react } from "signia";
 import {
   createGame,
-  prettyPrintGameState,
+  pretty,
   validPlays,
   type GameEvent,
   type GameState,
@@ -9,11 +9,7 @@ import {
 } from "./pec-wa";
 
 type PlayHand = (player: number, hand: Hand, runs: GameState["runs"]) => GameEvent;
-
-type PecWaPlayer = {
-  player: number;
-  play: PlayHand;
-};
+type PecWaPlayer = { player: number; play: PlayHand };
 
 const randomStrategy: PlayHand = (player, hand, runs) => {
   const availablePlays = validPlays(hand, runs);
@@ -29,7 +25,7 @@ const randomStrategy: PlayHand = (player, hand, runs) => {
   }
 };
 
-const gameRunner = (players: PecWaPlayer[]): Promise<GameState> => {
+const gameRunner = (players: PecWaPlayer[], quiet = false): Promise<GameState> => {
   return new Promise((resolve) => {
     let { state$, dispatch } = createGame();
 
@@ -37,8 +33,10 @@ const gameRunner = (players: PecWaPlayer[]): Promise<GameState> => {
       const state = state$.value;
 
       if (state.winner !== null) {
-        console.log("Game Over!");
-        prettyPrintGameState(state);
+        if (!quiet) {
+          console.log("Game Over!");
+          console.log(pretty.gameState(state));
+        }
         stop();
         resolve(state);
         return;
@@ -47,6 +45,10 @@ const gameRunner = (players: PecWaPlayer[]): Promise<GameState> => {
       const player = players[state.currentPlayer];
       const playerHand = state.players[state.currentPlayer];
       const event = player.play(state.currentPlayer, playerHand, state.runs);
+
+      if (!quiet) {
+        console.log(pretty.gameEvent(event));
+      }
 
       queueMicrotask(() => dispatch({ ...event, player: state.currentPlayer }));
     });

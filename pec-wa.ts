@@ -65,24 +65,34 @@ const suitSymbols: Record<Suit, string> = {
   clubs: "♧",
 };
 
-export const prettyPrintGameState = (state: GameState): void => {
-  const separator = "━".repeat(40);
-  const playerHands = state.players.map(
-    (hand, index) =>
-      `Player ${index + 1}: ${hand.length.toString().padStart(2, " ")} cards - ${hand.map((card) => `${suitSymbols[card.suit]} ${card.rank}`).join(" ")}`,
-  );
-  const runs = Object.entries(state.runs).map(
-    ([suit, cards]) =>
-      `${suitSymbols[suit as Suit]} : ${cards.map((card) => card.rank.padStart(2, " ")).join(" ")}`,
-  );
-  const winner = state.winner !== null ? `Winner: Player ${state.winner + 1}` : "No winner yet";
+export const pretty = {
+  gameState: (state: GameState) => {
+    const separator = "━".repeat(40);
+    const playerHands = state.players.map(
+      (hand, index) =>
+        `Player ${index + 1}: ${hand.length.toString().padStart(2, " ")} cards - ${hand.map((card) => `${suitSymbols[card.suit]} ${card.rank}`).join(" ")}`,
+    );
+    const runs = Object.entries(state.runs).map(
+      ([suit, cards]) =>
+        `${suitSymbols[suit as Suit]} : ${cards.map((card) => card.rank.padStart(2, " ")).join(" ")}`,
+    );
+    const winner = state.winner !== null ? `Winner: Player ${state.winner + 1}` : "No winner yet";
 
-  console.log(
-    [separator, ...playerHands, separator, "Table:", ...runs, separator, winner, separator].join(
-      "\n",
-    ),
-  );
-};
+    return (
+      [separator, ...playerHands, separator, "Table:", ...runs, separator, winner, separator].join(
+        "\n",
+      ),
+    );
+  },
+  gameEvent: (event: GameEvent) => {
+    switch (event.type) {
+      case "playCard":
+        return `Player ${event.player + 1} plays ${suitSymbols[event.card.suit]} ${event.card.rank}`;
+      case "passTurn":
+        return `Player ${event.player + 1} passes`;
+    }
+  }
+}
 
 type PlayCardEvent = { type: "playCard"; player: Player; card: Card };
 type PassTurnEvent = { type: "passTurn"; player: Player };
