@@ -40,8 +40,10 @@ import { atom } from "signia";
  */
 
 // Types
-type Suit = "hearts" | "diamonds" | "clubs" | "spades";
-type Rank = "A" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10" | "J" | "Q" | "K";
+export type Suit = "hearts" | "diamonds" | "clubs" | "spades";
+
+export const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"] as const
+export type Rank = typeof ranks[number];
 
 export interface Card {
   suit: Suit;
@@ -136,7 +138,6 @@ export const isValidPlay = (card: Card, runs: GameState["runs"]): boolean => {
   if (card.rank === "7") return true;
   if (run.length === 0) return false;
 
-  const ranks: Rank[] = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
   const lowestRank = run[0].rank;
   const highestRank = run[run.length - 1].rank;
   const cardIndex = ranks.indexOf(card.rank);
@@ -169,7 +170,6 @@ const playCard = (state: GameState, event: PlayCardEvent): GameState => {
       draft.runs[card.suit] = [];
     }
     const run = draft.runs[card.suit]!;
-    const ranks: Rank[] = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 
     if (run.length === 0 || card.rank === "7") {
       run.push(card);
