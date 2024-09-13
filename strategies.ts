@@ -30,7 +30,6 @@ export const randomStrategy: PlayHand = (player, hand, runs) => {
     We want to play the card that blocks the most possible cards from being played later,
     without blocking ourselves from playing cards later.
 */
-export const zaymon1: PlayHand = (player, hand, runs) => {
 export const zaymon: PlayHand = (player, hand, runs) => {
   const availablePlays = validPlays(hand, runs);
 
