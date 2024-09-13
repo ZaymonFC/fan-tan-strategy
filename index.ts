@@ -36,7 +36,7 @@ const gameRunner = (players: PecWaPlayer[], quiet = false): Promise<GameState> =
 
 async function testRandomStrategies(numGames: number = 5000) {
   const players: PecWaPlayer[] = [
-    { player: 0, play: randomStrategy },
+    { player: 0, play: zaymon1 },
     { player: 1, play: randomStrategy },
     { player: 2, play: randomStrategy },
     { player: 3, play: zaymon1 },

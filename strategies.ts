@@ -31,6 +31,7 @@ export const randomStrategy: PlayHand = (player, hand, runs) => {
     without blocking ourselves from playing cards later.
 */
 export const zaymon1: PlayHand = (player, hand, runs) => {
+export const zaymon: PlayHand = (player, hand, runs) => {
   const availablePlays = validPlays(hand, runs);
 
   if (availablePlays.length === 0) {
@@ -70,27 +71,28 @@ export const zaymon1: PlayHand = (player, hand, runs) => {
 
   const heuristics = [
     {
-      name: "highest in hand",
-      value: -1,
-      predicate: (card: Card) => {
-        // check if card is last in handBySuit
+      name: "play extremes",
+      value: (card: Card) => {
         const suit = handBySuit[card.suit];
-        return suit[suit.length - 1].rank === card.rank;
-      },
-    },
-    {
-      name: "lowest in hand",
-      value: -1,
-      predicate: (card: Card) => {
-        // check if card is first in handBySuit
-        const suit = handBySuit[card.suit];
-        return suit[0].rank === card.rank;
+        const isHighest = card.rank === suit[suit.length - 1].rank;
+        const isLowest = card.rank === suit[0].rank;
+
+        // If only card in suit
+        if (suit && suit.length === 1) {
+          if (card.rank === "7") {
+            return -100;
+          }
+        } else if (isHighest || isLowest) {
+          return -1;
+        }
+
+        return 0;
       },
     },
     {
       // If we have the very next card, we want to play this, because it still blocks progression.
       name: "next in sequence",
-      predicate: (card: Card) => {
+      value: (card: Card) => {
         const rankIndex = getRankIndex(card.rank);
         if (card.rank === "A" || card.rank === "K") {
           return 0;
@@ -99,12 +101,12 @@ export const zaymon1: PlayHand = (player, hand, runs) => {
         // do we have the next card in the sequence in our hand?
         // if above 7, rank + 1, if below 7, rank - 1
         const nextRank = rankIndex > 6 ? ranks[rankIndex + 1] : ranks[rankIndex - 1];
-        return handBySuit[card.suit].some((c) => c.rank === nextRank) ? 1 : 0;
+        return handBySuit[card.suit].some((c) => c.rank === nextRank) ? 10 : 0;
       },
     },
     {
       name: "distance from end card in hand",
-      predicate: (card: Card) => {
+      value: (card: Card) => {
         const suit = handBySuit[card.suit];
         const cardIndex = getRankIndex(card.rank);
         const sevenIndex = getRankIndex("7");
@@ -127,11 +129,7 @@ export const zaymon1: PlayHand = (player, hand, runs) => {
   const scoredPlays = availablePlays.map((card) => {
     let score = 0;
     for (const heuristic of heuristics) {
-      if (typeof heuristic.value === "number") {
-        score += heuristic.predicate(card) ? heuristic.value : 0;
-      } else {
-        score += heuristic.predicate(card);
-      }
+      score += heuristic.value(card);
     }
     return { card, score };
   });
